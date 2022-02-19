@@ -6,6 +6,8 @@ import { User } from './schemas/User';
 import { Product } from './schemas/Product';
 import { ProductImage } from './schemas/ProductImage';
 import { insertSeedData } from './seed-data';
+import { sendPasswordResetEmail } from './lib/mail';
+import { CartItem } from './schemas/CartItem';
 
 const dataBaseURL = process.env.DATABASE_URL || 'mongodb://localhost/keystone-sick-fits-tutorial'
 
@@ -21,6 +23,13 @@ const { withAuth } = createAuth({
     initFirstItem: {
         fields: ['name', 'email', 'password'],
         // TODO: ADD in initial roles here
+    },
+    passwordResetLink: {
+        async sendToken(args){
+            console.log(args);
+            //send the email
+            await sendPasswordResetEmail(args.token, args.identity);
+        }
     }
 });
 
@@ -48,6 +57,7 @@ export default withAuth(config(
             User: User,
             Product: Product,
             ProductImage: ProductImage,
+            CartItem: CartItem,
         }),
         ui: {
             isAccessAllowed: ({ session }) => {
