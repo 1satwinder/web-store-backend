@@ -1,9 +1,16 @@
 import { list } from "@keystone-next/keystone/schema";
 import { integer, relationship, select, text } from "@keystone-next/fields";
+import { isSignedIn, rules } from "../access";
 
 export const Product = list({
     // To-do:                                        
     // Access: 
+    access: {
+        create: isSignedIn,
+        read: rules.canReadProducts,
+        update: rules.canManageProducts,
+        delete: rules.canManageProducts,
+    }, 
     fields: {
         name: text({ isRequired: true }),
         description: text({
@@ -14,27 +21,27 @@ export const Product = list({
         photo: relationship({
             ref: 'ProductImage.product',
             ui: {
-                displayMode:'cards',
+                displayMode: 'cards',
                 cardFields: ['image', 'altText'],
-                inlineCreate: {fields: ['image','altText']},
-                inlineEdit: {fields: ['image', 'altText']},
+                inlineCreate: { fields: ['image', 'altText'] },
+                inlineEdit: { fields: ['image', 'altText'] },
             },
         }),
-        status : select({
+        status: select({
             options: [
-                {label: 'Draft', value: 'Draft'},
-                {label: 'Available', value: 'AVAILABLE'},
-                { label: 'Unavailable', value: 'UNAVAILABLE'}
+                { label: 'Draft', value: 'Draft' },
+                { label: 'Available', value: 'AVAILABLE' },
+                { label: 'Unavailable', value: 'UNAVAILABLE' }
             ],
             defaultValue: 'Draft',
             ui: {
                 displayMode: 'segmented-control',
-                // createView: {fieldMode: 'hidden'}
+                createView: {fieldMode: 'hidden'}
             },
         }),
         price: integer({}),
+        user: relationship({ ref: 'User.products', defaultValue: ({ context }) => ({ connect: { id: context.session.itemId } }) })
         //To-do photo
     }
 })
 
- 

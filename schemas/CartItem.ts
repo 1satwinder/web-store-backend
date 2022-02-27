@@ -1,9 +1,14 @@
 import { list } from "@keystone-next/keystone/schema";
 import { integer, relationship, select, text } from "@keystone-next/fields";
+import { isSignedIn, rules } from "../access";
 
-export const CartItem = list({
-    // To-do:                                        
-    // Access: 
+export const CartItem = list({                                        
+    access: {
+       create: isSignedIn,
+       read: rules.canOrder, 
+       update: rules.canOrder,
+       delete: rules.canOrder,
+    },
     fields: {
         // Todo: create a custom label here
         quantity: integer({

@@ -11,6 +11,8 @@ import { CartItem } from './schemas/CartItem';
 import { extendGraphqlSchema } from './mutations';
 import { OrderItem } from './schemas/OrderItem';
 import { Order } from './schemas/Order';
+import { Role } from './schemas/Role';
+import { permissionsList } from './schemas/fields';
 
 const dataBaseURL = process.env.DATABASE_URL || 'mongodb://localhost/keystone-sick-fits-tutorial'
 
@@ -25,7 +27,7 @@ const { withAuth } = createAuth({
     secretField: 'password',
     initFirstItem: {
         fields: ['name', 'email', 'password'],
-        // TODO: ADD in initial roles here
+        // TODO: ADD in initial roles here 
     },
     passwordResetLink: {
         async sendToken(args){
@@ -63,6 +65,7 @@ export default withAuth(config(
             CartItem: CartItem,
             OrderItem: OrderItem,
             Order: Order,
+            Role: Role,
         }),
         extendGraphqlSchema: extendGraphqlSchema,
         ui: {
@@ -72,7 +75,7 @@ export default withAuth(config(
             }
         }, 
         session: withItemData(statelessSessions(sessionConfig), {
-            User: 'id'
+            User: `id name email role { ${permissionsList.join(' ')} }`,
         })
     }
 ));
